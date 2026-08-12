@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.4.0",
   "type": "module",
-  "homepage": ".",
+  "homepage": "http:/Kronossdev.github.io/Maestro-IA/Prototipos/Tutor-IA/CODIGO/maestroai-app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -20,7 +20,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
-    "gh-pages": "^6.1.1",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1"
