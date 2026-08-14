@@ -1,9 +1,9 @@
 {
-  "name": "maestroia",
+  "name": "magici3lab",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
-  "homepage": "http:/Kronossdev.github.io/Maestro-IA/Prototipos/Tutor-IA/CODIGO/maestroai-app",
+  "homepage": "https://Kronossdev.github.io/Maestro-IA/Prototipos/Tutor-IA/CODIGO/maestroia-app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

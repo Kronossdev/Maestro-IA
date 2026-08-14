@@ -1,4 +1,4 @@
-# MaestrolA — proyecto local (Vite + React + Tailwind)
+# MagicI3lab — proyecto local (Vite + React + Tailwind)
 
 Prototipo funcional del tutor de IA + Biblioteca Digital + Calendario + Panel
 Docente para el Diplomado en Gestión de Innovación Corporativa (i3lab · ESPOL).
@@ -61,43 +61,63 @@ Abre la URL que te muestre la terminal (normalmente <http://localhost:5173>).
 
 Hay dos formas:
 
+La biblioteca ahora tiene tres niveles: **Materia** (Design Thinking / Gestión
+de la Creatividad / Modelo de Negocios) → **Módulo** (ej. "Módulo 2: El Doble
+Diamante") → **Submódulo** (ej. "2.1 Las Cuatro Fases del Doble Diamante"),
+que es la unidad mínima que un estudiante marca como "vista".
+
 ### A. Desde la app (rápido, sin tocar código)
 
-Inicia sesión como **docente** → pestaña **Material**. Ahí puedes:
-- Pegar texto directo en el cuadro de texto, o
-- Subir un archivo **.docx** (se lee automáticamente con la librería
-  `mammoth`) o **.txt**.
+Inicia sesión como **docente** → pestaña **Material** → tab **"Estructura y
+videos"**. Ahí puedes:
+- Reordenar módulos y submódulos con las flechas ↑↓.
+- Mover un submódulo a otro módulo con el selector.
+- Agregar un submódulo nuevo (texto y/o un video de hasta 10 minutos) a
+  cualquier módulo con el botón "Agregar tema o video".
+- Borrar los submódulos que tú mismo agregaste (el temario base no se puede
+  borrar desde aquí, solo reordenar o mover, para no perder contenido curado).
 
-Ese contenido se guarda y se suma al conocimiento del tutor de IA para ese
-módulo — tanto en el chat como en Resumen/Quiz/Podcast de la Biblioteca.
+En el tab **"Material adicional"** puedes además pegar texto libre o subir un
+**.docx**/**.txt** que se suma al conocimiento de Cogni para toda la materia,
+sin aparecer como un tema navegable en la Biblioteca (útil para notas o casos
+de estudio que no ameritan ser su propio submódulo).
 
-> **Importante en este proyecto local:** ese contenido se guarda en el
-> `localStorage` de tu propio navegador (ver sección de `window.storage` más
-> abajo). Si abres la app en otro navegador o dispositivo, no lo vas a ver
-> — para que un docente suba material y lo vean todos los estudiantes desde
-> cualquier dispositivo, hace falta el backend propio que se explica al
-> final de este documento.
+Todo esto se suma automáticamente al conocimiento de Cogni — tanto en el chat
+como en Resumen/Quiz/Podcast de la Biblioteca — y a la lista de temas que usa
+el clasificador para saber sobre qué te preguntan los estudiantes.
+
+> **Importante en este proyecto local:** los videos que subas y los cambios
+> de estructura se guardan en el navegador donde los subiste (`localStorage`
+> para el orden/texto, `IndexedDB` para los videos — ver más abajo). Si abres
+> la app en otro navegador o dispositivo, no los vas a ver — para que un
+> docente suba material y lo vean todos los estudiantes desde cualquier
+> dispositivo, hace falta el backend propio que se explica al final de este
+> documento.
 
 ### B. Directo en el código (permanente, para todos)
 
-Edita `src/App.jsx`, busca el array `LIBRARY` (cerca de la línea 60) y
-agrega o edita lecciones dentro del módulo `m1` (Design Thinking), `m2`
-(Gestión de la Creatividad) o `m3` (Modelo de Negocios). Cada lección es
-así de simple:
+Edita `src/App.jsx`, busca el array `LIBRARY` (cerca de la línea 100) y
+agrega o edita submódulos dentro de la materia `dt` (Design Thinking), `gc`
+(Gestión de la Creatividad) o `mn` (Modelo de Negocios), dentro del módulo
+que corresponda. Cada submódulo es así de simple:
 
 ```js
 {
-  id: "m1l6",
+  id: "dt-m1-4",
+  num: "1.4",
   title: "Tu nuevo tema",
   type: "lectura",
   minutes: 8,
   content: `Pega aquí el texto (puedes copiarlo de un Word). Usa saltos de
 línea dobles para separar párrafos.`,
+  // opcional: videos: [{ id: "dt-m1-4-v1", title: "...", src: "videos/archivo.mp4" }],
 },
 ```
 
-No hace falta tocar nada más — el tutor de IA lee automáticamente todo lo
-que haya en `LIBRARY`.
+No hace falta tocar nada más — Cogni lee automáticamente todo lo que haya en
+`LIBRARY`. Los videos precargados (los que vienen con este proyecto) viven
+como archivos normales en `public/videos/` — para agregar uno nuevo por
+código, copia el `.mp4` ahí y referencia su ruta en `src`.
 
 ---
 
@@ -150,7 +170,7 @@ la key a un sitio público sin control de cuota.
    ```bash
    git init
    git add .
-   git commit -m "MaestrolA — primera versión"
+   git commit -m "MagicI3lab — primera versión"
    git branch -M main
    git remote add origin https://github.com/TU-USUARIO/TU-REPO.git
    git push -u origin main
@@ -189,6 +209,30 @@ que es **solo del navegador donde lo abriste**. Para que estudiantes y
 docentes reales compartan esos datos entre dispositivos distintos, hace
 falta un backend propio — el mismo que ya se venía recomendando para
 proteger el contenido pago del diplomado y las API keys en producción.
+
+Dentro de ese mismo navegador, sí es realista para la validación: si entras
+como estudiante de prueba (Jorge/Erin/Aquiles) y le preguntas a Cogni sobre
+un tema repetidamente, tu progreso y tus dudas quedan guardados con tu
+nombre real, y aparecen así en el panel del docente **en ese navegador**.
+
+## Nota sobre los videos (IndexedDB)
+
+Los videos que sube el docente desde la app no se guardan en `localStorage`
+(su límite es de apenas unos MB) sino en **IndexedDB**, un almacén del
+navegador pensado para archivos más pesados. Aun así, sigue siendo
+almacenamiento local a ese navegador — no hay backend real. Por eso:
+- El límite de subida es de **10 minutos** por video (se valida leyendo la
+  duración real del archivo antes de aceptarlo) y **180 MB** de tamaño, para
+  no saturar el navegador.
+- Un video subido en la laptop del docente **no aparece** en el celular de
+  un estudiante — solo los videos precargados (los que vienen incluidos en
+  `public/videos/`) se ven igual en cualquier dispositivo, porque esos sí
+  viajan con el sitio publicado.
+- Para que los videos subidos por el docente se vean desde cualquier
+  dispositivo, la solución real es subirlos a un storage de archivos (S3,
+  Google Cloud Storage, etc.) desde un backend propio — no está incluido en
+  este prototipo por el mismo motivo que el resto de las limitaciones ya
+  documentadas aquí.
 
 ## Credenciales de prueba
 
